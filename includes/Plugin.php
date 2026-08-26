@@ -76,6 +76,10 @@ final class Plugin {
 		if ( class_exists( '\\EDT\\Integrations\\ElementorPro' ) ) {
 			( new \EDT\Integrations\ElementorPro() )->register();
 		}
+
+		if ( class_exists( '\\EDT\\API\\REST' ) ) {
+			( new \EDT\API\REST() )->register();
+		}
 	}
 
 	public function maybe_show_elementor_notice(): void {

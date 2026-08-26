@@ -6,7 +6,7 @@
  * Version: 0.1.0
  * Requires at least: 6.0
  * Requires PHP: 8.1
- * Author: Elementor Dynamic Toolkit
+ * Author: SK
  * Text Domain: elementor-dynamic-toolkit
  * Domain Path: /languages
  *
