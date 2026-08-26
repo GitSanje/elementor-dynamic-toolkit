@@ -27,17 +27,17 @@ final class Widget extends AbstractQueryWidget {
 	}
 
 	public function get_categories(): array {
-		return [ 'general' ];
+		return [ \EDT\Elementor\Categories::SLUG ];
 	}
 
 	protected function register_controls(): void {
 		QueryControl::add_query_controls( $this );
+		$this->add_visibility_controls();
 	}
 
 	protected function render(): void {
 		$settings = $this->get_settings_for_display();
-		$args = $this->get_query_settings( $settings );
-		$query = new \WP_Query( $args );
+		$query = $this->execute_query( $settings );
 
 		if ( ! $query->have_posts() ) {
 			$this->render_no_posts_notice();

@@ -24,7 +24,7 @@ final class Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_categories(): array {
-		return [ 'general' ];
+		return [ \EDT\Elementor\Categories::SLUG ];
 	}
 
 	protected function register_controls(): void {

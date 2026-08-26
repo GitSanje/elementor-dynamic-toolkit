@@ -1,0 +1,10 @@
+/**
+ * Editor styles for the Elementor Dynamic Toolkit.
+ */
+
+.edt-editor-panel {
+	padding: 12px 16px;
+	background: #f7f7f7;
+	border: 1px solid #e5e5e5;
+	border-radius: 6px;
+}

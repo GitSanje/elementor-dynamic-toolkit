@@ -64,6 +64,7 @@ final class Manager {
 		}
 
 		$this->load_default_tags();
+		$tags = apply_filters( 'edt/dynamic_fields', $this->get_tags() );
 		$elementor_manager->register_group(
 			'edt',
 			[
@@ -71,8 +72,10 @@ final class Manager {
 			]
 		);
 
-		foreach ( $this->get_tags() as $tag ) {
-			$elementor_manager->register( $tag );
+		foreach ( is_array( $tags ) ? $tags : [] as $tag ) {
+			if ( $tag instanceof \Elementor\Core\DynamicTags\Tag ) {
+				$elementor_manager->register( $tag );
+			}
 		}
 	}
 }

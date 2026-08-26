@@ -20,11 +20,20 @@ final class Conditions {
 				}
 
 				$settings = $widget->get_settings_for_display();
-				if ( empty( $settings['edt_visibility'] ) ) {
-					return $content;
+				$rules = [];
+				if ( 'yes' === ( $settings['edt_visibility_enabled'] ?? '' ) ) {
+					$login_status = sanitize_key( (string) ( $settings['edt_visibility_login'] ?? '' ) );
+					if ( 'logged' === $login_status ) {
+						$rules[] = new \EDT\Conditions\UserCondition( true );
+					} elseif ( 'guest' === $login_status ) {
+						$rules[] = new \EDT\Conditions\UserCondition( false );
+					}
 				}
 
-				$rules = is_array( $settings['edt_visibility'] ) ? $settings['edt_visibility'] : [];
+				if ( ! empty( $settings['edt_visibility'] ) && is_array( $settings['edt_visibility'] ) ) {
+					$rules = $settings['edt_visibility'];
+				}
+
 				if ( empty( $rules ) ) {
 					return $content;
 				}

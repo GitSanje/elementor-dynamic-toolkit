@@ -19,6 +19,14 @@ final class ConditionManager {
 		return $this->conditions[ $key ] ?? null;
 	}
 
+	/**
+	 * @return array<string, ConditionInterface>
+	 */
+	public function get_all(): array {
+		$conditions = apply_filters( 'edt/conditions', $this->conditions );
+		return is_array( $conditions ) ? $conditions : [];
+	}
+
 	public function evaluate( array $rules, array $context = [], string $operator = 'AND' ): bool {
 		$results = [];
 

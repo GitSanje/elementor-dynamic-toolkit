@@ -22,12 +22,22 @@ final class Widgets {
 		add_action(
 			'elementor/widgets/register',
 			static function ( $widgets_manager ): void {
-				$widgets_manager->register( new DynamicQueryWidget() );
-				$widgets_manager->register( new DynamicPostGridWidget() );
-				$widgets_manager->register( new DynamicTableWidget() );
-				$widgets_manager->register( new TaxonomyListWidget() );
-				$widgets_manager->register( new DynamicCardsWidget() );
-				$widgets_manager->register( new ContentSwitcherWidget() );
+				$widgets = [
+					new DynamicQueryWidget(),
+					new DynamicPostGridWidget(),
+					new DynamicTableWidget(),
+					new TaxonomyListWidget(),
+					new DynamicCardsWidget(),
+					new ContentSwitcherWidget(),
+				];
+
+				$widgets = apply_filters( 'edt/widgets', $widgets );
+
+				foreach ( is_array( $widgets ) ? $widgets : [] as $widget ) {
+					if ( is_object( $widget ) && method_exists( $widget, 'get_name' ) ) {
+						$widgets_manager->register( $widget );
+					}
+				}
 			}
 		);
 	}

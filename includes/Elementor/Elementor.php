@@ -25,6 +25,7 @@ final class Elementor {
 		}
 
 		( new Widgets() )->register();
+		( new Categories() )->register();
 		( new Controls() )->register();
 		( new DynamicTags() )->register();
 		( new Conditions() )->register();

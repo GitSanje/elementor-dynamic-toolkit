@@ -1,0 +1,13 @@
+/**
+ * Frontend styles for the Elementor Dynamic Toolkit.
+ */
+
+.edt-widget {
+	position: relative;
+	width: 100%;
+}
+
+.edt-empty-state {
+	color: #666;
+	font-size: 0.95rem;
+}

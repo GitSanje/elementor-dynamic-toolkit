@@ -28,7 +28,7 @@ final class QueryControl {
 			'post_type',
 			[
 				'label'   => esc_html__( 'Post Type', 'elementor-dynamic-toolkit' ),
-				'type'    => Controls_Manager::SELECT,
+				'type'    => QuerySelectControl::TYPE,
 				'options' => $post_type_options,
 				'default' => 'post',
 			]
@@ -81,7 +81,7 @@ final class QueryControl {
 			'taxonomy',
 			[
 				'label'       => esc_html__( 'Taxonomy', 'elementor-dynamic-toolkit' ),
-				'type'        => Controls_Manager::SELECT,
+				'type'        => QuerySelectControl::TYPE,
 				'options'     => $taxonomy_options,
 				'placeholder' => esc_html__( 'All taxonomies', 'elementor-dynamic-toolkit' ),
 				'condition'   => [ 'post_type!' => '' ],

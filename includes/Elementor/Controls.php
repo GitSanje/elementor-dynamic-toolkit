@@ -7,6 +7,8 @@
 
 namespace EDT\Elementor;
 
+use EDT\Controls\QuerySelectControl;
+
 defined( 'ABSPATH' ) || exit;
 
 final class Controls {
@@ -15,9 +17,8 @@ final class Controls {
 		add_action(
 			'elementor/controls/register',
 			static function ( $controls_manager ): void {
-				if ( class_exists( '\\EDT\\Controls\\QueryControl' ) ) {
-					// The shared control library is exposed via helper classes and is used by widgets
-					// instead of embedding repeated inline control definitions.
+				if ( class_exists( QuerySelectControl::class ) ) {
+					$controls_manager->register( new QuerySelectControl() );
 				}
 			}
 		);

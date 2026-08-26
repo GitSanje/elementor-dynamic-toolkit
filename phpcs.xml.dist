@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<ruleset name="Elementor Dynamic Toolkit">
+	<description>WordPress coding standards for Elementor Dynamic Toolkit.</description>
+	<rule ref="WordPress" />
+	<file>elementor-dynamic-toolkit.php</file>
+	<file>includes</file>
+	<file>tests</file>
+	<exclude-pattern>vendor/</exclude-pattern>
+</ruleset>

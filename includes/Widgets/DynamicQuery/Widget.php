@@ -28,11 +28,12 @@ final class Widget extends AbstractQueryWidget {
 	}
 
 	public function get_categories() {
-		return [ 'general' ];
+		return [ \EDT\Elementor\Categories::SLUG ];
 	}
 
 	protected function register_controls() {
 		QueryControl::add_query_controls( $this );
+		$this->add_visibility_controls();
 	}
 
 	protected function render() {

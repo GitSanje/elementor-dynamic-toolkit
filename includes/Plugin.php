@@ -59,6 +59,14 @@ final class Plugin {
 			dirname( Constants::BASENAME ) . '/languages'
 		);
 
+		if ( class_exists( '\\EDT\\Developer\\Hooks' ) ) {
+			\EDT\Developer\Hooks::register();
+		}
+
+		if ( class_exists( '\\EDT\\Admin\\Admin' ) ) {
+			( new \EDT\Admin\Admin() )->register();
+		}
+
 		if ( ! $this->is_supported_elementor_available() ) {
 			return;
 		}

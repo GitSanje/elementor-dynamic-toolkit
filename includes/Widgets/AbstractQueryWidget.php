@@ -8,6 +8,8 @@
 namespace EDT\Widgets;
 
 use EDT\Query\QueryBuilder;
+use EDT\Query\QueryExecutor;
+use EDT\Controls\VisibilityControl;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -46,5 +48,13 @@ abstract class AbstractQueryWidget extends \Elementor\Widget_Base {
 
 	protected function render_no_posts_notice(): void {
 		echo '<p class="edt-query-empty">' . esc_html__( 'No posts found.', 'elementor-dynamic-toolkit' ) . '</p>';
+	}
+
+	protected function execute_query( array $settings ): \WP_Query {
+		return ( new QueryExecutor() )->execute( $this->get_query_settings( $settings ) );
+	}
+
+	protected function add_visibility_controls(): void {
+		VisibilityControl::add_controls( $this );
 	}
 }
