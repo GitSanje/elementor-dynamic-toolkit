@@ -9,10 +9,11 @@ namespace EDT\Widgets\DynamicQuery;
 
 use EDT\Controls\QueryControl;
 use EDT\Query\QueryBuilder;
+use EDT\Widgets\AbstractQueryWidget;
 
 defined( 'ABSPATH' ) || exit;
 
-final class Widget extends \Elementor\Widget_Base {
+final class Widget extends AbstractQueryWidget {
 
 	public function get_name() {
 		return 'edt_dynamic_query';
