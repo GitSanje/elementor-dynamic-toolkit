@@ -1,11 +1,19 @@
 <?php
 /**
- * Main plugin application.
+ * Main plugin application bootstrap.
  *
  * @package ElementorDynamicToolkit
  */
 
 namespace EDT;
+
+use EDT\Core\Container;
+use EDT\Providers\ProviderManager;
+use EDT\Providers\QueryProviderManager;
+use EDT\Services\AssetService;
+use EDT\Services\CacheService;
+use EDT\Services\Logger;
+use EDT\Rendering\WidgetRenderer;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -59,12 +67,18 @@ final class Plugin {
 			dirname( Constants::BASENAME ) . '/languages'
 		);
 
+		$this->register_core_services();
+
 		if ( class_exists( '\\EDT\\Developer\\Hooks' ) ) {
 			\EDT\Developer\Hooks::register();
 		}
 
 		if ( class_exists( '\\EDT\\Admin\\Admin' ) ) {
 			( new \EDT\Admin\Admin() )->register();
+		}
+
+		if ( class_exists( '\\EDT\\API\\REST' ) ) {
+			( new \EDT\API\REST() )->register();
 		}
 
 		if ( ! $this->is_supported_elementor_available() ) {
@@ -84,10 +98,17 @@ final class Plugin {
 		if ( class_exists( '\\EDT\\Integrations\\ElementorPro' ) ) {
 			( new \EDT\Integrations\ElementorPro() )->register();
 		}
+	}
 
-		if ( class_exists( '\\EDT\\API\\REST' ) ) {
-			( new \EDT\API\REST() )->register();
-		}
+	private function register_core_services(): void {
+		$container = Container::instance();
+
+		$container->bind( 'cache', static fn () => new CacheService() );
+		$container->bind( 'logger', static fn () => new Logger() );
+		$container->bind( 'assets', static fn () => new AssetService() );
+		$container->bind( 'renderer', static fn () => new WidgetRenderer() );
+		$container->bind( 'data_providers', static fn () => new ProviderManager() );
+		$container->bind( 'query_providers', static fn () => new QueryProviderManager() );
 	}
 
 	public function maybe_show_elementor_notice(): void {

@@ -7,6 +7,8 @@
 
 namespace EDT\DynamicTags;
 
+use EDT\Constants;
+
 defined( 'ABSPATH' ) || exit;
 
 final class Manager {
@@ -37,6 +39,7 @@ final class Manager {
 		$this->register_tag( new TaxonomyTag() );
 		$this->register_tag( new RelatedPostTag() );
 		$this->register_tag( new OptionFieldTag() );
+		$this->register_tag( new UserTag() );
 
 		if ( function_exists( 'get_field' ) ) {
 			$this->register_tag( new ACFFieldTag() );
@@ -45,7 +48,7 @@ final class Manager {
 		$this->loaded = true;
 	}
 
-	public function register_tag( $tag ): void {
+	public function register_tag( mixed $tag ): void {
 		if ( $tag instanceof \Elementor\Core\DynamicTags\Tag ) {
 			$this->tags[] = $tag;
 		}
@@ -58,13 +61,14 @@ final class Manager {
 		return $this->tags;
 	}
 
-	public function register( $elementor_manager ): void {
-		if ( ! class_exists( '\\Elementor\\Core\\DynamicTags\\Manager' ) ) {
+	public function register( mixed $elementor_manager ): void {
+		if ( ! is_object( $elementor_manager ) || ! method_exists( $elementor_manager, 'register_group' ) ) {
 			return;
 		}
 
 		$this->load_default_tags();
 		$tags = apply_filters( 'edt/dynamic_fields', $this->get_tags() );
+
 		$elementor_manager->register_group(
 			'edt',
 			[
@@ -73,7 +77,7 @@ final class Manager {
 		);
 
 		foreach ( is_array( $tags ) ? $tags : [] as $tag ) {
-			if ( $tag instanceof \Elementor\Core\DynamicTags\Tag ) {
+			if ( $tag instanceof \Elementor\Core\DynamicTags\Tag && method_exists( $elementor_manager, 'register' ) ) {
 				$elementor_manager->register( $tag );
 			}
 		}

@@ -18,33 +18,34 @@ final class ProviderManager {
 
 	public function __construct() {
 		$this->register( new CoreProvider() );
+		$this->register( new UserProvider() );
+		$this->register( new OptionProvider() );
 
 		if ( function_exists( 'get_field' ) ) {
 			$this->register( new ACFProvider() );
 		}
+
+		if ( function_exists( 'WC' ) ) {
+			$this->register( new WooCommerceProvider() );
+		}
 	}
 
 	public function register( DataProviderInterface $provider ): self {
-		$this->providers[ $provider->get_id() ] = $provider;
+		$this->providers[ sanitize_key( $provider->get_id() ) ] = $provider;
 		return $this;
 	}
 
+	/**
+	 * @return array<string, DataProviderInterface>
+	 */
 	public function get_providers(): array {
-		$providers = $this->providers;
-		$providers = apply_filters( 'edt/data_providers', $providers );
+		$providers = apply_filters( 'edt/data_providers', $this->providers );
 
-		return array_values( $providers );
+		return is_array( $providers ) ? $providers : [];
 	}
 
 	public function get( string $provider_id ): ?DataProviderInterface {
 		$providers = $this->get_providers();
-
-		foreach ( $providers as $provider ) {
-			if ( $provider instanceof DataProviderInterface && $provider_id === $provider->get_id() ) {
-				return $provider;
-			}
-		}
-
-		return null;
+		return $providers[ sanitize_key( $provider_id ) ] ?? null;
 	}
 }

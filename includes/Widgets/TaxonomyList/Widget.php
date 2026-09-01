@@ -1,15 +1,23 @@
 <?php
 /**
- * Taxonomy list widget.
+ * Taxonomy List Widget.
  *
  * @package ElementorDynamicToolkit
  */
 
 namespace EDT\Widgets\TaxonomyList;
 
+use EDT\Controls\TaxonomyControl;
+use EDT\Controls\VisibilityControl;
+use EDT\Rendering\RenderContext;
+use EDT\Rendering\WidgetRenderer;
+use Elementor\Controls_Manager;
+
 defined( 'ABSPATH' ) || exit;
 
 final class Widget extends \Elementor\Widget_Base {
+
+	private ?WidgetRenderer $renderer = null;
 
 	public function get_name(): string {
 		return 'edt_taxonomy_list';
@@ -27,11 +35,17 @@ final class Widget extends \Elementor\Widget_Base {
 		return [ \EDT\Elementor\Categories::SLUG ];
 	}
 
+	public function get_renderer(): WidgetRenderer {
+		$this->renderer ??= new WidgetRenderer();
+		return $this->renderer;
+	}
+
 	protected function register_controls(): void {
 		$this->start_controls_section(
 			'taxonomy_section',
 			[
-				'label' => esc_html__( 'Taxonomy', 'elementor-dynamic-toolkit' ),
+				'label' => esc_html__( 'Taxonomy Settings', 'elementor-dynamic-toolkit' ),
+				'tab'   => Controls_Manager::TAB_CONTENT,
 			]
 		);
 
@@ -39,37 +53,61 @@ final class Widget extends \Elementor\Widget_Base {
 			'taxonomy',
 			[
 				'label'   => esc_html__( 'Taxonomy', 'elementor-dynamic-toolkit' ),
-				'type'    => \Elementor\Controls_Manager::SELECT,
-				'options' => \EDT\Controls\TaxonomyControl::options(),
+				'type'    => Controls_Manager::SELECT,
+				'options' => TaxonomyControl::options(),
+				'default' => 'category',
+			]
+		);
+
+		$this->add_control(
+			'layout_style',
+			[
+				'label'   => esc_html__( 'Display Style', 'elementor-dynamic-toolkit' ),
+				'type'    => Controls_Manager::SELECT,
+				'options' => [
+					'list'   => esc_html__( 'List View', 'elementor-dynamic-toolkit' ),
+					'inline' => esc_html__( 'Inline Cloud / Tags', 'elementor-dynamic-toolkit' ),
+				],
+				'default' => 'list',
+			]
+		);
+
+		$this->add_control(
+			'show_count',
+			[
+				'label'        => esc_html__( 'Show Post Count Badge', 'elementor-dynamic-toolkit' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'default'      => 'yes',
+			]
+		);
+
+		$this->add_control(
+			'hide_empty',
+			[
+				'label'        => esc_html__( 'Hide Empty Terms', 'elementor-dynamic-toolkit' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'default'      => 'yes',
 			]
 		);
 
 		$this->end_controls_section();
+
+		VisibilityControl::add_controls( $this );
 	}
 
 	protected function render(): void {
-		$taxonomy = sanitize_key( (string) $this->get_settings_for_display( 'taxonomy' ) );
-		if ( '' === $taxonomy ) {
-			echo '<p class="edt-taxonomy-list__empty">' . esc_html__( 'No taxonomy selected.', 'elementor-dynamic-toolkit' ) . '</p>';
-			return;
-		}
+		$settings = $this->get_settings_for_display();
+		$settings['widget_id'] = $this->get_id();
+		$context  = new RenderContext( $settings );
 
-		$terms = get_terms(
+		$this->get_renderer()->render(
+			'widgets/taxonomy-list/wrapper',
 			[
-				'taxonomy'   => $taxonomy,
-				'hide_empty' => true,
+				'context'  => $context,
+				'renderer' => $this->get_renderer(),
 			]
 		);
-
-		if ( is_wp_error( $terms ) || empty( $terms ) ) {
-			echo '<p class="edt-taxonomy-list__empty">' . esc_html__( 'No terms found.', 'elementor-dynamic-toolkit' ) . '</p>';
-			return;
-		}
-
-		echo '<ul class="edt-taxonomy-list">';
-		foreach ( $terms as $term ) {
-			echo '<li class="edt-taxonomy-list__item"><a href="' . esc_url( get_term_link( $term ) ) . '">' . esc_html( $term->name ) . '</a></li>';
-		}
-		echo '</ul>';
 	}
 }

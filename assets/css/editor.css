@@ -1,10 +1,56 @@
 /**
- * Editor styles for the Elementor Dynamic Toolkit.
+ * Elementor Dynamic Toolkit - Editor Stylesheet
  */
 
-.edt-editor-panel {
-	padding: 12px 16px;
-	background: #f7f7f7;
-	border: 1px solid #e5e5e5;
-	border-radius: 6px;
+.edt-async-select-field {
+	width: 100%;
+	padding: 6px 10px;
+	border: 1px solid #d5dadf;
+	border-radius: 3px;
+	font-size: 12px;
+	background: #ffffff;
+}
+
+.edt-condition-builder-control {
+	background: #f1f3f5;
+	border: 1px solid #d5dadf;
+	border-radius: 4px;
+	padding: 12px;
+	margin-top: 8px;
+}
+
+.edt-condition-builder-header {
+	margin-bottom: 12px;
+}
+
+.edt-condition-builder__relation {
+	width: 100%;
+	font-weight: 600;
+}
+
+.edt-condition-rule-item {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+	background: #ffffff;
+	border: 1px solid #e1e4e8;
+	padding: 8px;
+	border-radius: 3px;
+	margin-bottom: 8px;
+}
+
+.edt-condition-rule-item select,
+.edt-condition-rule-item input {
+	font-size: 11px;
+	height: 28px;
+}
+
+.edt-condition-rule-remove {
+	color: #e54b4b;
+	cursor: pointer;
+	padding: 4px 6px;
+}
+
+.edt-condition-rule-remove:hover {
+	color: #c92a2a;
 }

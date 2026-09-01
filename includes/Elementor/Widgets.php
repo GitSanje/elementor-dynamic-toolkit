@@ -34,7 +34,7 @@ final class Widgets {
 				$widgets = apply_filters( 'edt/widgets', $widgets );
 
 				foreach ( is_array( $widgets ) ? $widgets : [] as $widget ) {
-					if ( is_object( $widget ) && method_exists( $widget, 'get_name' ) ) {
+					if ( is_object( $widget ) && method_exists( $widget, 'get_name' ) && method_exists( $widgets_manager, 'register' ) ) {
 						$widgets_manager->register( $widget );
 					}
 				}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Dynamic table widget.
+ * Dynamic Table Widget.
  *
  * @package ElementorDynamicToolkit
  */
@@ -9,6 +9,7 @@ namespace EDT\Widgets\DynamicTable;
 
 use EDT\Controls\QueryControl;
 use EDT\Widgets\AbstractQueryWidget;
+use Elementor\Controls_Manager;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -26,36 +27,53 @@ final class Widget extends AbstractQueryWidget {
 		return 'eicon-table';
 	}
 
-	public function get_categories(): array {
-		return [ \EDT\Elementor\Categories::SLUG ];
-	}
-
 	protected function register_controls(): void {
 		QueryControl::add_query_controls( $this );
+
+		$this->start_controls_section(
+			'table_headers_section',
+			[
+				'label' => esc_html__( 'Table Headers', 'elementor-dynamic-toolkit' ),
+				'tab'   => Controls_Manager::TAB_CONTENT,
+			]
+		);
+
+		$this->add_control(
+			'title_header',
+			[
+				'label'   => esc_html__( 'Title Column Header', 'elementor-dynamic-toolkit' ),
+				'type'    => Controls_Manager::TEXT,
+				'default' => esc_html__( 'Title', 'elementor-dynamic-toolkit' ),
+			]
+		);
+
+		$this->add_control(
+			'author_header',
+			[
+				'label'   => esc_html__( 'Author Column Header', 'elementor-dynamic-toolkit' ),
+				'type'    => Controls_Manager::TEXT,
+				'default' => esc_html__( 'Author', 'elementor-dynamic-toolkit' ),
+			]
+		);
+
+		$this->add_control(
+			'date_header',
+			[
+				'label'   => esc_html__( 'Date Column Header', 'elementor-dynamic-toolkit' ),
+				'type'    => Controls_Manager::TEXT,
+				'default' => esc_html__( 'Date', 'elementor-dynamic-toolkit' ),
+			]
+		);
+
+		$this->end_controls_section();
+
 		$this->add_visibility_controls();
 	}
 
 	protected function render(): void {
 		$settings = $this->get_settings_for_display();
-		$query = $this->execute_query( $settings );
+		$result   = $this->execute_query( $settings );
 
-		if ( ! $query->have_posts() ) {
-			$this->render_no_posts_notice();
-			return;
-		}
-
-		echo '<table class="edt-dynamic-table">';
-		echo '<thead><tr><th>' . esc_html__( 'Title', 'elementor-dynamic-toolkit' ) . '</th><th>' . esc_html__( 'Date', 'elementor-dynamic-toolkit' ) . '</th></tr></thead>';
-		echo '<tbody>';
-		while ( $query->have_posts() ) {
-			$query->the_post();
-			echo '<tr>';
-			echo '<td><a href="' . esc_url( get_permalink() ) . '">' . esc_html( get_the_title() ) . '</a></td>';
-			echo '<td>' . esc_html( get_the_date() ) . '</td>';
-			echo '</tr>';
-		}
-		echo '</tbody>';
-		echo '</table>';
-		wp_reset_postdata();
+		$this->render_template( 'widgets/dynamic-table/wrapper', $settings, $result );
 	}
 }

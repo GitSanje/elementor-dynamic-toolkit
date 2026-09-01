@@ -1,4 +1,10 @@
 <?php
+/**
+ * Condition Registry and Rule Engine Manager.
+ *
+ * @package ElementorDynamicToolkit
+ */
+
 namespace EDT\Conditions;
 
 defined( 'ABSPATH' ) || exit;
@@ -10,13 +16,31 @@ final class ConditionManager {
 	 */
 	private array $conditions = [];
 
+	public function __construct() {
+		$this->register( 'user_status', new UserCondition() );
+		$this->register( 'user_role', new RoleCondition() );
+		$this->register( 'user_capability', new CapabilityCondition() );
+		$this->register( 'post_type', new PostCondition() );
+		$this->register( 'date_time', new DateCondition() );
+		$this->register( 'device', new DeviceCondition() );
+		$this->register( 'url_parameter', new UrlCondition() );
+
+		if ( function_exists( 'get_field' ) ) {
+			$this->register( 'acf_field', new ACFCondition() );
+		}
+
+		if ( function_exists( 'WC' ) ) {
+			$this->register( 'woocommerce', new WooCondition() );
+		}
+	}
+
 	public function register( string $key, ConditionInterface $condition ): void {
 		$this->conditions[ sanitize_key( $key ) ] = $condition;
 	}
 
 	public function get( string $key ): ?ConditionInterface {
-		$key = sanitize_key( $key );
-		return $this->conditions[ $key ] ?? null;
+		$conditions = $this->get_all();
+		return $conditions[ sanitize_key( $key ) ] ?? null;
 	}
 
 	/**
@@ -28,50 +52,11 @@ final class ConditionManager {
 	}
 
 	public function evaluate( array $rules, array $context = [], string $operator = 'AND' ): bool {
-		$results = [];
-
-		foreach ( $rules as $rule ) {
-			if ( $rule instanceof ConditionInterface ) {
-				$results[] = $rule->evaluate( $context );
-				continue;
-			}
-
-			if ( is_array( $rule ) && isset( $rule['condition'] ) ) {
-				$condition = $this->resolve_condition( $rule['condition'] );
-				$results[] = $condition ? $condition->evaluate( $context ) : false;
-				continue;
-			}
-
-			$results[] = false;
+		if ( empty( $rules ) ) {
+			return true;
 		}
 
-		$normalized_operator = strtoupper( $operator );
-
-		if ( 'NOT' === $normalized_operator ) {
-			return ! ( $results[0] ?? false );
-		}
-
-		if ( 'OR' === $normalized_operator ) {
-			return in_array( true, $results, true );
-		}
-
-		return ! in_array( false, $results, true );
-	}
-
-	private function resolve_condition( mixed $condition ): ?ConditionInterface {
-		if ( $condition instanceof ConditionInterface ) {
-			return $condition;
-		}
-
-		if ( is_callable( $condition ) ) {
-			$instance = $condition();
-			return $instance instanceof ConditionInterface ? $instance : null;
-		}
-
-		if ( is_string( $condition ) ) {
-			return $this->get( $condition );
-		}
-
-		return null;
+		$group = new RuleGroup( $operator, $rules );
+		return $group->evaluate( $this, $context );
 	}
 }

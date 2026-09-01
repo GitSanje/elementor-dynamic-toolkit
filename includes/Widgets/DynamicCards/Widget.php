@@ -1,6 +1,6 @@
 <?php
 /**
- * Dynamic cards widget.
+ * Dynamic Cards Widget.
  *
  * @package ElementorDynamicToolkit
  */
@@ -9,6 +9,7 @@ namespace EDT\Widgets\DynamicCards;
 
 use EDT\Controls\QueryControl;
 use EDT\Widgets\AbstractQueryWidget;
+use Elementor\Controls_Manager;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -26,33 +27,35 @@ final class Widget extends AbstractQueryWidget {
 		return 'eicon-posts-carousel';
 	}
 
-	public function get_categories(): array {
-		return [ \EDT\Elementor\Categories::SLUG ];
-	}
-
 	protected function register_controls(): void {
 		QueryControl::add_query_controls( $this );
+
+		$this->start_controls_section(
+			'cards_display_section',
+			[
+				'label' => esc_html__( 'Card Settings', 'elementor-dynamic-toolkit' ),
+				'tab'   => Controls_Manager::TAB_CONTENT,
+			]
+		);
+
+		$this->add_control(
+			'excerpt_length',
+			[
+				'label'   => esc_html__( 'Excerpt Length', 'elementor-dynamic-toolkit' ),
+				'type'    => Controls_Manager::NUMBER,
+				'default' => 18,
+			]
+		);
+
+		$this->end_controls_section();
+
 		$this->add_visibility_controls();
 	}
 
 	protected function render(): void {
 		$settings = $this->get_settings_for_display();
-		$query = $this->execute_query( $settings );
+		$result   = $this->execute_query( $settings );
 
-		if ( ! $query->have_posts() ) {
-			$this->render_no_posts_notice();
-			return;
-		}
-
-		echo '<div class="edt-dynamic-cards">';
-		while ( $query->have_posts() ) {
-			$query->the_post();
-			echo '<article class="edt-dynamic-cards__item">';
-			echo '<h3 class="edt-dynamic-cards__title"><a href="' . esc_url( get_permalink() ) . '">' . esc_html( get_the_title() ) . '</a></h3>';
-			echo '<div class="edt-dynamic-cards__excerpt">' . esc_html( wp_trim_words( get_the_excerpt(), 18 ) ) . '</div>';
-			echo '</article>';
-		}
-		echo '</div>';
-		wp_reset_postdata();
+		$this->render_template( 'widgets/dynamic-cards/wrapper', $settings, $result );
 	}
 }

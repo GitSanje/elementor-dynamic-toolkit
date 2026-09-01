@@ -1,21 +1,20 @@
 <?php
 /**
- * Reusable meta field control definition.
+ * Meta Field Control Helper.
  *
  * @package ElementorDynamicToolkit
  */
 
 namespace EDT\Controls;
 
+use EDT\Providers\ProviderManager;
+
 defined( 'ABSPATH' ) || exit;
 
 final class MetaFieldControl {
 
-	public static function config( string $label = 'Meta Field', string $placeholder = 'meta_key' ): array {
-		return [
-			'label'       => esc_html__( $label, 'elementor-dynamic-toolkit' ),
-			'type'        => \Elementor\Controls_Manager::TEXT,
-			'placeholder' => esc_html__( $placeholder, 'elementor-dynamic-toolkit' ),
-		];
+	public static function get_fields( int $post_id = 0 ): array {
+		$provider = ( new ProviderManager() )->get( 'core' );
+		return $provider ? $provider->get_fields( $post_id ) : [];
 	}
 }

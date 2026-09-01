@@ -7,6 +7,9 @@
 
 namespace EDT\Providers;
 
+use EDT\Providers\Query\WPQueryProvider;
+use EDT\Providers\Query\WooCommerceQueryProvider;
+
 defined( 'ABSPATH' ) || exit;
 
 final class QueryProviderManager {
@@ -15,6 +18,11 @@ final class QueryProviderManager {
 	 * @var array<string, QueryProviderInterface>
 	 */
 	private array $providers = [];
+
+	public function __construct() {
+		$this->register( new WPQueryProvider() );
+		$this->register( new WooCommerceQueryProvider() );
+	}
 
 	public function register( QueryProviderInterface $provider ): self {
 		$this->providers[ sanitize_key( $provider->get_id() ) ] = $provider;
@@ -34,12 +42,15 @@ final class QueryProviderManager {
 	}
 
 	public function resolve( array $args ): ?QueryProviderInterface {
-		foreach ( $this->get_all() as $provider ) {
-			if ( $provider->supports( $args ) ) {
+		$providers = $this->get_all();
+
+		// Check specialized providers first (skip default fallback)
+		foreach ( $providers as $id => $provider ) {
+			if ( 'wp_query' !== $id && $provider->supports( $args ) ) {
 				return $provider;
 			}
 		}
 
-		return null;
+		return $providers['wp_query'] ?? null;
 	}
 }

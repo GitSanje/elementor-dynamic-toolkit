@@ -24,11 +24,13 @@ final class Elementor {
 			return;
 		}
 
-		( new Widgets() )->register();
 		( new Categories() )->register();
+		( new Widgets() )->register();
 		( new Controls() )->register();
 		( new DynamicTags() )->register();
 		( new Conditions() )->register();
+		( new Assets() )->register();
+		( new Editor() )->register();
 
 		$this->registered = true;
 	}

@@ -7,7 +7,8 @@
 
 namespace EDT\Elementor;
 
-use EDT\Controls\QuerySelectControl;
+use EDT\Controls\AsyncSelectControl;
+use EDT\Controls\ConditionBuilderControl;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -17,8 +18,12 @@ final class Controls {
 		add_action(
 			'elementor/controls/register',
 			static function ( $controls_manager ): void {
-				if ( class_exists( QuerySelectControl::class ) ) {
-					$controls_manager->register( new QuerySelectControl() );
+				if ( class_exists( AsyncSelectControl::class ) && method_exists( $controls_manager, 'register' ) ) {
+					$controls_manager->register( new AsyncSelectControl() );
+				}
+
+				if ( class_exists( ConditionBuilderControl::class ) && method_exists( $controls_manager, 'register' ) ) {
+					$controls_manager->register( new ConditionBuilderControl() );
 				}
 			}
 		);

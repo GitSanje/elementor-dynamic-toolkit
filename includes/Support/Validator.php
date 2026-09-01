@@ -1,6 +1,6 @@
 <?php
 /**
- * Validation helpers.
+ * Validator utility.
  *
  * @package ElementorDynamicToolkit
  */
@@ -11,20 +11,25 @@ defined( 'ABSPATH' ) || exit;
 
 final class Validator {
 
-	public static function is_valid_post_type( mixed $value ): bool {
-		return is_string( $value ) && post_type_exists( sanitize_key( $value ) );
-	}
-
-	public static function is_valid_taxonomy( mixed $value, string $post_type = 'post' ): bool {
-		if ( ! is_string( $value ) ) {
-			return false;
+	public static function is_valid_post_type( string $post_type ): bool {
+		$post_type = sanitize_key( $post_type );
+		if ( ! function_exists( 'get_post_types' ) ) {
+			return true;
 		}
-
-		$taxonomy = sanitize_key( $value );
-		return taxonomy_exists( $taxonomy ) && is_object_in_taxonomy( $post_type, $taxonomy );
+		$public = get_post_types( [ 'public' => true ] );
+		return isset( $public[ $post_type ] );
 	}
 
-	public static function is_numeric_positive_int( mixed $value ): bool {
-		return is_numeric( $value ) && (int) $value > 0;
+	public static function is_valid_taxonomy( string $taxonomy ): bool {
+		$taxonomy = sanitize_key( $taxonomy );
+		if ( ! function_exists( 'taxonomy_exists' ) ) {
+			return true;
+		}
+		return taxonomy_exists( $taxonomy );
+	}
+
+	public static function is_valid_orderby( string $orderby ): bool {
+		$allowed = [ 'date', 'title', 'menu_order', 'modified', 'rand', 'ID', 'comment_count', 'meta_value', 'meta_value_num' ];
+		return in_array( sanitize_key( $orderby ), $allowed, true );
 	}
 }
